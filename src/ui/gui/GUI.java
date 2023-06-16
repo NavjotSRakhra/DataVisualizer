@@ -22,6 +22,7 @@ public class GUI {
     private final int V_PANEL_WIDTH = 400, V_PANEL_HEIGHT = 400, ARRAY_SIZE = 200;
     private final JPanel actionPanel;
     private ArrayVisualizer arr;
+    private Thread sortingThread;
 
     public GUI() {
         mainFrame = new JFrame("Data visualizer");
@@ -93,6 +94,7 @@ public class GUI {
         arr = new ArrayVisualizer(initializeRandomArray());
         visualizationPanel.setNewData(arr);
         SwingUtilities.invokeLater(visualizationPanel::repaint);
+        sortingThread = null;
     }
 
     private int[] initializeRandomArray() {
@@ -134,16 +136,23 @@ public class GUI {
 
     private void startSorting(ActionEvent e) {
         int delayMillisecond = delaySlider.getValue();
-        new Thread(() -> {
-            switch ((SortAction) Objects.requireNonNull(actionsList.getSelectedItem())) {
-                case BUBBLE_SORT -> BubbleSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
-                case INSERTION_SORT ->
-                        InsertionSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
-                case QUICK_SORT -> QuickSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
-                case MERGE_SORT -> MergeSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
-                case SELECTION_SORT ->
-                        SelectionSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
-            }
-        }).start();
+        if (sortingThread == null) {
+            sortingThread = new Thread(() -> {
+                switch ((SortAction) Objects.requireNonNull(actionsList.getSelectedItem())) {
+                    case BUBBLE_SORT ->
+                            BubbleSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
+                    case INSERTION_SORT ->
+                            InsertionSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
+                    case QUICK_SORT ->
+                            QuickSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
+                    case MERGE_SORT ->
+                            MergeSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
+                    case SELECTION_SORT ->
+                            SelectionSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
+                }
+                sortingThread = null;
+            });
+            sortingThread.start();
+        }
     }
 }
