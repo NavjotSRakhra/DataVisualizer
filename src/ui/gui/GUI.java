@@ -1,17 +1,16 @@
 package ui.gui;
 
 import data.ArrayVisualizer;
-import data.dataActions.sort.BubbleSort;
-import data.dataActions.sort.InsertionSort;
-import data.dataActions.sort.QuickSort;
-import data.dataActions.sort.SortAction;
+import data.dataActions.sort.*;
 import ui.elements.dynamic.VisualizationJPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 
 public class GUI {
     private static final int MIN_DELAY = 0, MAX_DELAY = 50;
@@ -19,7 +18,8 @@ public class GUI {
     private final VisualizationJPanel visualizationPanel;
     private final JComboBox<SortAction> actionsList;
     private final JSlider delaySlider;
-    private final int V_PANEL_WIDTH = 800, V_PANEL_HEIGHT = 800, ARRAY_SIZE = 400;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int V_PANEL_WIDTH = 400, V_PANEL_HEIGHT = 400, ARRAY_SIZE = 200;
     private final JPanel actionPanel;
     private ArrayVisualizer arr;
 
@@ -36,7 +36,6 @@ public class GUI {
 
         initializeVisualizationPanel();
         initializeMainFrame();
-        ;
     }
 
     private JPanel initializePanelWithLayout(int axis) {
@@ -48,6 +47,7 @@ public class GUI {
     }
 
     private void initializeActionPanelElements() {
+
         actionPanel.add(addUpperActionPanel());
         actionPanel.add(new Box.Filler(new Dimension(0, 10), new Dimension(0, 10), new Dimension(0, 10)));
         actionPanel.add(new Label("Delay in ms"));
@@ -83,9 +83,8 @@ public class GUI {
 
         upperActionPanel.add(new Box.Filler(new Dimension(20, 0), new Dimension(20, 0), new Dimension(20, 0)));
 
-        for (SortAction value : SortAction.values()) {
-            actionsList.addItem(value);
-        }
+        Arrays.stream(SortAction.values()).forEach(actionsList::addItem);
+
         upperActionPanel.add(actionsList);
         return upperActionPanel;
     }
@@ -127,17 +126,23 @@ public class GUI {
 
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
+        mainFrame.setResizable(false);
         mainFrame.pack();
+        mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);
     }
 
     private void startSorting(ActionEvent e) {
-        int delay = delaySlider.getValue();
+        int delayMillisecond = delaySlider.getValue();
         new Thread(() -> {
-            switch ((SortAction) actionsList.getSelectedItem()) {
-                case BUBBLE_SORT -> BubbleSort.sortAndVisualizeDataWithDelay(delay, arr, visualizationPanel);
-                case INSERTION_SORT -> InsertionSort.sortAndVisualizeDataWithDelay(delay, arr, visualizationPanel);
-                case QUICK_SORT -> QuickSort.sortAndVisualizeDataWithDelay(delay, arr, visualizationPanel);
+            switch ((SortAction) Objects.requireNonNull(actionsList.getSelectedItem())) {
+                case BUBBLE_SORT -> BubbleSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
+                case INSERTION_SORT ->
+                        InsertionSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
+                case QUICK_SORT -> QuickSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
+                case MERGE_SORT -> MergeSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
+                case SELECTION_SORT ->
+                        SelectionSort.sortAndVisualizeDataWithDelay(delayMillisecond, arr, visualizationPanel);
             }
         }).start();
     }

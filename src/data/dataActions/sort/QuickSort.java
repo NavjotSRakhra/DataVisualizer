@@ -2,20 +2,14 @@ package data.dataActions.sort;
 
 import data.ArrayVisualizer;
 import data.ArrayVisualizers;
-import data.dataActions.Action;
 
 import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.stream.IntStream;
 
 public class QuickSort {
-    public static void sortAndVisualizeDataWithDelay(int delay, ArrayVisualizer data, JPanel panel) {
-        ArrayVisualizers.performActionOn(data, new Action() {
-            @Override
-            public void action(int[] arr) {
-                quickSort(arr, 0, arr.length - 1, delay, panel);
-            }
-        });
+    public static void sortAndVisualizeDataWithDelay(int delayMilliSeconds, ArrayVisualizer data, JPanel panel) {
+        ArrayVisualizers.performActionOn(data, arr -> quickSort(arr, 0, arr.length - 1, delayMilliSeconds, panel));
     }
 
     private static void quickSort(int[] arr, int startIndex, int endIndex, int delay, JPanel panel) {
@@ -35,7 +29,7 @@ public class QuickSort {
         int ind = IntStream.range(startIndex, endIndex + 1)
                 .filter(a -> temp == arr[a])
                 .findFirst()
-                .getAsInt();
+                .orElse(-1);
         swap(arr, endIndex, ind);
 
         int pointer = startIndex;

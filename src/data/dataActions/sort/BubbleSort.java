@@ -2,25 +2,21 @@ package data.dataActions.sort;
 
 import data.ArrayVisualizer;
 import data.ArrayVisualizers;
-import data.dataActions.Action;
 
 import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
 
 public class BubbleSort {
-    public static void sortAndVisualizeDataWithDelay(int delay, ArrayVisualizer data, JPanel panel) {
-        ArrayVisualizers.performActionOn(data, new Action() {
-            @Override
-            public void action(int[] arr) {
-                for (int i = 0; i < arr.length; i++) {
-                    for (int j = 0; j < arr.length - 1 - i; j++) {
-                        if (arr[j] > arr[j + 1]) swap(arr, j, j + 1);
-                        try {
-                            SwingUtilities.invokeAndWait(panel::repaint);
-                            Thread.sleep(delay);
-                        } catch (InterruptedException | InvocationTargetException e) {
-                            throw new RuntimeException(e);
-                        }
+    public static void sortAndVisualizeDataWithDelay(int delayMilliSeconds, ArrayVisualizer data, JPanel panel) {
+        ArrayVisualizers.performActionOn(data, arr -> {
+            for (int i = 0; i < arr.length; i++) {
+                for (int j = 0; j < arr.length - 1 - i; j++) {
+                    if (arr[j] > arr[j + 1]) swap(arr, j, j + 1);
+                    try {
+                        SwingUtilities.invokeAndWait(panel::repaint);
+                        Thread.sleep(delayMilliSeconds);
+                    } catch (InterruptedException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }
